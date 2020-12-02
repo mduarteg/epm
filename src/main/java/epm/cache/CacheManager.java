@@ -1,13 +1,17 @@
 package epm.cache;
 
 import epm.model.EventRate;
+import epm.model.RatedEvent;
 import epm.repository.EventRateRepository;
+import epm.repository.RatedEventRepository;
+import epm.util.PropertyManager;
 import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.util.List;
+import java.util.Map;
 
 public class CacheManager {
 
@@ -49,7 +53,8 @@ public class CacheManager {
     private static void loadEventRateData() {
         eventRateCache.clear();
 
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("epm");
+        Map<String, String> props = PropertyManager.getEmProperties();
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("epm", props);
         EntityManager em = emf.createEntityManager();
 
         EventRateRepository repo = new EventRateRepository();
@@ -60,5 +65,8 @@ public class CacheManager {
             logger.info("Adding value with key: " + ev.getEventType() + "_" + ev.getEffectiveDate());
             eventRateCache.set(ev.getEventType() + "_" + ev.getEffectiveDate(), ev);
         }
+
+        em.clear();
+        em.close();
     }
 }

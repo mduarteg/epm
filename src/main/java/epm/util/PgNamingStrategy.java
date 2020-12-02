@@ -28,7 +28,7 @@ public class PgNamingStrategy extends PhysicalNamingStrategyStandardImpl {
 
     @Override
     public Identifier toPhysicalTableName(Identifier name, JdbcEnvironment context) {
-        return super.toPhysicalTableName(toSnakeCase(name), context);
+        return super.toPhysicalTableName(toUpperSnakeCase(name), context);
     }
 
     private Identifier toSnakeCase(Identifier id) {
@@ -38,6 +38,21 @@ public class PgNamingStrategy extends PhysicalNamingStrategyStandardImpl {
 
         String name = id.getText();
         String snakeName = name.replaceAll("([a-z]+)([A-Z]+)", "$1\\_$2").toLowerCase();
+        if (!snakeName.equals(name)) {
+            return new Identifier(snakeName, id.isQuoted());
+        }
+        else {
+            return id;
+        }
+    }
+
+    private Identifier toUpperSnakeCase(Identifier id) {
+        if (id == null) {
+            return null;
+        }
+
+        String name = id.getText();
+        String snakeName = name.replaceAll("([a-z]+)([A-Z]+)", "$1\\_$2").toUpperCase();
         if (!snakeName.equals(name)) {
             return new Identifier(snakeName, id.isQuoted());
         }

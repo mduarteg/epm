@@ -4,6 +4,7 @@ import epm.cache.CacheManager;
 import epm.handler.FileHandler;
 import epm.listener.FileListener;
 import epm.parse.EventParser;
+import epm.persistence.EventPersistence;
 import epm.rate.EventWorker;
 import epm.util.PropertyManager;
 import org.apache.log4j.Logger;
@@ -16,11 +17,12 @@ public class Engine {
         init();
         initCache();
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 2; i++) {
             new Thread(new FileListener()).start();
             new Thread(new FileHandler()).start();
             new Thread(new EventParser()).start();
             new Thread(new EventWorker()).start();
+            new Thread(new EventPersistence()).start();
         }
     }
 

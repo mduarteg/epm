@@ -14,7 +14,6 @@ import java.util.List;
 
 public class SimpleRater implements Rater {
 
-    private static final Logger logger = Logger.getLogger(SimpleRater.class);
     private BaseEvent eventToRate;
     private EventRate eventRater;
 
@@ -39,10 +38,10 @@ public class SimpleRater implements Rater {
 
     @Override
     public BaseEvent rate() {
-        logger.info("Rating event " + eventToRate.toString());
-        int unitsConsumed = getConsumption() / eventRater.getUnitRate();
-        double totalCharge = unitsConsumed * eventRater.getUnitRate();
+        int unitsConsumed = getConsumption() / eventRater.getUnitAmount();
+        eventToRate.setUnitsConsumed(unitsConsumed);
 
+        double totalCharge = unitsConsumed * eventRater.getUnitRate();
         eventToRate.setTotalCharge(totalCharge);
 
         return eventToRate;
