@@ -5,8 +5,8 @@ import epm.event.BaseEvent;
 import epm.event.GPRSEvent;
 import epm.event.GSMEvent;
 import epm.event.SMSEvent;
+import epm.exception.RateDateOutOfRangeException;
 import epm.model.EventRate;
-import org.apache.log4j.Logger;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -22,7 +22,7 @@ public class SimpleRater implements Rater {
     }
 
     @Override
-    public void loadRaterData() {
+    public void loadRaterData() throws RateDateOutOfRangeException {
         List<EventRate> rateInfo = CacheManager.getInstance().getEventRate(eventToRate.getEventType().toString());
         LocalDateTime eventStartTime = eventToRate.getStartTime();
 
@@ -33,6 +33,10 @@ public class SimpleRater implements Rater {
                 eventRater = e;
                 break;
             }
+        }
+
+        if (eventRater == null) {
+            throw new RateDateOutOfRangeException("Event could not be rated - There is no effective event rate date before the event start date.");
         }
     }
 

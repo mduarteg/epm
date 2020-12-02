@@ -3,6 +3,7 @@
     <persistence-unit name="epm">
         <class>epm.model.EventRate</class>
         <class>epm.model.RatedEvent</class>
+        <class>epm.model.RejectedEvent</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />

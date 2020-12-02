@@ -1,6 +1,7 @@
 package epm.rate;
 
 import epm.event.BaseEvent;
+import epm.exception.RateDateOutOfRangeException;
 import epm.rate.factory.SimpleRaterFactory;
 import epm.util.QueueManager;
 import org.apache.log4j.Logger;
@@ -14,7 +15,16 @@ public class EventWorker implements Runnable {
         BaseEvent event = QueueManager.rateQueue.poll();
 
         if (event != null && !event.isRejected()) {
-            BaseEvent ratedEvent = raterFactory.rateEvent(event);
+            BaseEvent ratedEvent = null;
+
+            try {
+                ratedEvent = raterFactory.rateEvent(event);
+            } catch (RateDateOutOfRangeException e) {
+                ratedEvent = event;
+                ratedEvent.setRejected(true);
+                ratedEvent.setRejectionReason(e.getMessage());
+            }
+
             logger.info("Rated event " + event.toString());
 
             try {

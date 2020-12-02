@@ -3,6 +3,7 @@ package epm.persistence;
 import epm.event.BaseEvent;
 import epm.model.RatedEvent;
 import epm.repository.RatedEventRepository;
+import epm.repository.RejectedEventRepository;
 import epm.util.EntityManagerUtils;
 import epm.util.EventUtils;
 import epm.util.PropertyManager;
@@ -33,16 +34,22 @@ public class EventPersistence implements Runnable {
     }
 
     private void persistToDB() {
-        RatedEventRepository repository = new RatedEventRepository();
+        RatedEventRepository ratedRepository = new RatedEventRepository();
+        RejectedEventRepository rejectedRepository = new RejectedEventRepository();
         EntityManager em = EntityManagerUtils.getEntityManager();
 
         try {
             EntityManagerUtils.beginTransaction();
 
-            repository.setEntityManager(em);
+            ratedRepository.setEntityManager(em);
+            rejectedRepository.setEntityManager(em);
 
             for (BaseEvent e : eventsToPersist) {
-                repository.save(getRatedEvent(e));
+                if (!e.isRejected()) {
+                    ratedRepository.save(EventUtils.getRatedEvent(e));
+                } else {
+                    rejectedRepository.save(EventUtils.getRejectedEvent(e));
+                }
             }
 
             EntityManagerUtils.commit();
@@ -53,16 +60,6 @@ public class EventPersistence implements Runnable {
                 EntityManagerUtils.rollback();
             }
         }
-    }
-
-    private RatedEvent getRatedEvent(BaseEvent e) {
-        return new RatedEvent(
-                e.getEventType().toString(),
-                EventUtils.getTargetResource(e),
-                e.getStartTime(),
-                e.getUnitsConsumed(),
-                e.getTotalCharge()
-        );
     }
 
     @Override
