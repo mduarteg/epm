@@ -62,7 +62,7 @@ public class CacheManager {
         Iterable<EventRate> all = repo.findAll();
 
         for(EventRate ev : all) {
-            logger.info("Adding value with key: " + ev.getEventType() + "_" + ev.getEffectiveDate());
+            logger.info("Adding value to event rate cache with key: " + ev.getEventType() + "_" + ev.getEffectiveDate());
             eventRateCache.set(ev.getEventType() + "_" + ev.getEffectiveDate(), ev);
         }
 

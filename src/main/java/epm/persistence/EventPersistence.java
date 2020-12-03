@@ -1,7 +1,6 @@
 package epm.persistence;
 
 import epm.event.BaseEvent;
-import epm.model.RatedEvent;
 import epm.repository.RatedEventRepository;
 import epm.repository.RejectedEventRepository;
 import epm.util.EntityManagerUtils;
@@ -13,13 +12,21 @@ import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class EventPersistence implements Runnable {
 
     private final List<BaseEvent> eventsToPersist = Collections.synchronizedList(new ArrayList<>());
 
     private void persistEvent() {
-        BaseEvent event = QueueManager.persistQueue.poll();
+        BaseEvent event;
+
+        try {
+            event = QueueManager.persistQueue.poll(1000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            return;
+        }
+
         int batchSize = PropertyManager.getPropertyIntValue("epm.persist.batch.size");
 
         if (event != null) {

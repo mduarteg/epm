@@ -17,7 +17,6 @@ public class FileHandler implements Runnable {
         try {
             file = QueueManager.fileQueue.poll(1000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
             return;
         }
 

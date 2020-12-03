@@ -48,6 +48,10 @@ public class FileUtils {
         }
     }
 
+    public static boolean pathExists(Path path) {
+        return Files.exists(path);
+    }
+
     private static Path rename(Path file, String mark) throws IOException {
         String filename = file.getFileName().toString();
         int idxOf = filename.indexOf(".txt");

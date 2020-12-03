@@ -12,13 +12,21 @@ import org.apache.log4j.Logger;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
 
 public class EventParser implements Runnable {
 
     private static final Logger logger = Logger.getLogger(EventParser.class);
 
     public void parseEvent() {
-        String line = QueueManager.parseQueue.poll();
+        String line;
+
+        try {
+            line = QueueManager.parseQueue.poll(1000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            return;
+        }
+
         BaseEvent event;
 
         if (line == null) return;

@@ -1,15 +1,19 @@
 package epm.listener;
 
+import epm.exception.InputPathException;
 import epm.exception.PropertyException;
 import epm.util.FileUtils;
 import epm.util.PropertyManager;
 import epm.util.QueueManager;
+import org.apache.log4j.Logger;
 
 import java.nio.file.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class FileListener implements Runnable {
+
+    private static final Logger logger = Logger.getLogger(FileListener.class);
 
     public void listen() throws Exception {
         String path = PropertyManager.getPropertyValue("epm.input.events.location");
@@ -28,13 +32,26 @@ public class FileListener implements Runnable {
         int waitTime = Integer.parseInt(sleepTime);
         Path filePath = Paths.get("./" + path);
 
+        if (!inputPathExists(filePath)) {
+            sleepThread(waitTime);
+            throw new InputPathException(String.format("Files input directory does not exists - %s", path));
+        }
+
         List<Path> newFiles = FileUtils.readAndRenameNewFiles(filePath, mark);
 
         for (Path file : newFiles) {
             QueueManager.fileQueue.put(file);
         }
 
-        TimeUnit.MILLISECONDS.sleep(waitTime * 1000);
+        sleepThread(waitTime);
+    }
+
+    private void sleepThread(int sleepTime) throws InterruptedException {
+        TimeUnit.MILLISECONDS.sleep(sleepTime * 1000);
+    }
+
+    private boolean inputPathExists(Path path) {
+        return FileUtils.pathExists(path);
     }
 
     @Override
@@ -43,7 +60,7 @@ public class FileListener implements Runnable {
             try {
                 listen();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(String.format("File listener error - %s", e.getMessage()));
             }
         }
     }
