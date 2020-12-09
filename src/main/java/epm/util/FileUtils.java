@@ -2,6 +2,7 @@ package epm.util;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +14,7 @@ public class FileUtils {
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(filePath, p -> !p.getFileName().toString().contains(mark))) {
             for (Path file : stream) {
-                Path renamedFile = rename(file, mark);
+                Path renamedFile = renameWithTime(file, mark);
                 newFiles.add(renamedFile);
             }
         } catch (DirectoryIteratorException ex) {
@@ -52,10 +53,12 @@ public class FileUtils {
         return Files.exists(path);
     }
 
-    private static Path rename(Path file, String mark) throws IOException {
+    private static Path renameWithTime(Path file, String mark) throws IOException {
         String filename = file.getFileName().toString();
         int idxOf = filename.indexOf(".txt");
-        String renamed = filename.substring(0, idxOf) + mark + ".txt";
+        Instant instant = Instant.now();
+
+        String renamed = filename.substring(0, idxOf) + mark + "_" + instant.getEpochSecond() + ".txt";
         return Files.move(file, file.resolveSibling(renamed));
     }
 }

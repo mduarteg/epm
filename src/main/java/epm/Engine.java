@@ -38,11 +38,26 @@ public class Engine {
         int raterThreads = PropertyManager.getPropertyIntValue("epm.rater.threads");
         int persistThreads = PropertyManager.getPropertyIntValue("epm.persist.threads");
 
-        Executors.newFixedThreadPool(listenerThreads).execute(new FileListener());
-        Executors.newFixedThreadPool(handlerThreads).execute(new FileHandler());
-        Executors.newFixedThreadPool(parserThreads).execute(new EventParser());
-        Executors.newFixedThreadPool(raterThreads).execute(new EventWorker());
-        Executors.newFixedThreadPool(persistThreads).execute(new EventPersistence());
+        for (int i = 0; i < listenerThreads; i++) {
+            new Thread(new FileListener()).start();
+        }
+
+        for (int i = 0; i < handlerThreads; i++) {
+            new Thread(new FileHandler()).start();
+        }
+
+        for (int i = 0; i < parserThreads; i++) {
+            new Thread(new EventParser()).start();
+        }
+
+        for (int i = 0; i < raterThreads; i++) {
+            new Thread(new EventWorker()).start();
+        }
+
+        for (int i = 0; i < persistThreads; i++) {
+            new Thread(new EventPersistence()).start();
+        }
+
     }
 
 }

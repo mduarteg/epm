@@ -33,7 +33,7 @@ public class EventWorker implements Runnable {
                 ratedEvent.setRejectionReason(e.getMessage());
             }
 
-            logger.info("Rated event " + event.toString());
+            logger.info(Thread.currentThread().getName() + " - " + "Rated event " + event.toString());
 
             try {
                 QueueManager.persistQueue.put(ratedEvent);

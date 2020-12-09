@@ -7,7 +7,7 @@ import epm.event.SMSEvent;
 import epm.exception.EventFormatException;
 import epm.util.EventType;
 import epm.util.QueueManager;
-import epm.util.TypeUtils;
+import epm.util.ValidateUtils;
 import org.apache.log4j.Logger;
 
 import java.time.LocalDateTime;
@@ -27,13 +27,14 @@ public class EventParser implements Runnable {
             return;
         }
 
-        BaseEvent event;
-
         if (line == null) return;
 
+        BaseEvent event;
         event = stringToEvent(line);
 
         if (event == null) return;
+
+        logger.info(Thread.currentThread().getName() + " - " + "Parsed event " + event.toString());
 
         try {
             QueueManager.rateQueue.put(event);
@@ -47,12 +48,17 @@ public class EventParser implements Runnable {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
         try {
-            validateFormat(line);
+            ValidateUtils.validateFormat(line);
         } catch (EventFormatException e) {
             logger.error(String.format("Event line { %s } was rejected with error: %s", line, e.getMessage()));
+
             return rejectEventLine(e.getMessage());
         }
 
+        return getBaseEvent(csv, formatter);
+    }
+
+    private BaseEvent getBaseEvent(String[] csv, DateTimeFormatter formatter) {
         switch (EventType.valueOf(csv[0])) {
             case GSM:
                 return new GSMEvent(
@@ -97,38 +103,6 @@ public class EventParser implements Runnable {
                 LocalDateTime.now(),
                 message
         );
-    }
-
-    private void validateFormat(String line) throws EventFormatException {
-        String[] csv = line.split(",");
-
-        validateLength(csv);
-        validateData(csv);
-
-    }
-
-    private void validateData(String[] csv) throws EventFormatException {
-        if (TypeUtils.isNullOrEmpty(csv[1]) || TypeUtils.isNullOrEmpty(csv[4])) {
-            throw new EventFormatException("Event could not be parsed - Resources are missing");
-        }
-
-        if (!TypeUtils.isEnumValue(csv[0])) {
-            throw new EventFormatException("Event could not be parsed - Event type is invalid");
-        }
-
-        if (!TypeUtils.isInteger(csv[3])) {
-            throw new EventFormatException("Event could not be parsed - Event consumption is invalid");
-        }
-
-        if (!TypeUtils.isLocalDateTime(csv[2])) {
-            throw new EventFormatException("Event could not be parsed - Event date is invalid");
-        }
-    }
-
-    private void validateLength(String[] csv) throws EventFormatException {
-        if (csv.length != 5) {
-            throw new EventFormatException("Event could not be parsed - The number of values is invalid");
-        }
     }
 
 

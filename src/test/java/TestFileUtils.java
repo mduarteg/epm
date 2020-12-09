@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestFileUtils {
     @Test
@@ -26,7 +27,7 @@ public class TestFileUtils {
 
         List<Path> files = FileUtils.readAndRenameNewFiles(dir, mark);
 
-        assertEquals(files.get(0).getFileName().toString(), "test_file_inProgress.txt");
+        assertTrue(files.get(0).getFileName().toString().contains(mark));
     }
 
     @Test

@@ -13,9 +13,9 @@ public class QueueManager {
     public static BlockingQueue<String> parseQueue;
 
     static {
-        fileQueue = new ArrayBlockingQueue<>(10);
-        rateQueue = new ArrayBlockingQueue<>(1000);
-        persistQueue = new ArrayBlockingQueue<>(1000);
-        parseQueue = new ArrayBlockingQueue<>(1000);
+        fileQueue = new ArrayBlockingQueue<>(100);
+        parseQueue = new ArrayBlockingQueue<>(5000);
+        rateQueue = new ArrayBlockingQueue<>(5000);
+        persistQueue = new ArrayBlockingQueue<>(5000);
     }
 }

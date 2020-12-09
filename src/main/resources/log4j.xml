@@ -26,15 +26,15 @@
     </logger>
 
     <logger name="org.hibernate.SQL">
-        <level value="DEBUG"/>
+        <level value="ERROR"/>
     </logger>
 
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder">
-        <level value="TRACE" />
+        <level value="ERROR" />
     </logger>
 
     <root>
-        <level value="DEBUG" />
+        <level value="INFO" />
         <appender-ref ref="file" />
         <appender-ref ref="console" />
     </root>
